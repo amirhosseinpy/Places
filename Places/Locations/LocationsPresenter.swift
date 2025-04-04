@@ -5,35 +5,41 @@
 //  Created by Amirhossein Validabadi on 03/04/2025.
 //
 import Combine
-import Foundation
+import UIKit
 
 @MainActor
-class LocationsPresenter: ObservableObject {
-  @Published var state: LocationsState = .loading
+class LocationsPresenter: Presentable, ObservableObject {
+  @Published var state: DefaultViewState<[LocationModel]> = .loading
   
-  private let interactor: LocationsInteractor
+  private let interactor: LocationsInteractorProtocol
   
-  init(interactor: LocationsInteractor = LocationsInteractor()) {
+  init(interactor: LocationsInteractorProtocol = LocationsInteractor()) {
     self.interactor = interactor
   }
   
-  func loadLocations() {
+  func fetchData() {
     Task {
       do {
-        var locations = try await interactor.getLocations()
+        let locations = try await interactor.getLocations()
         let locationsViewModel: [LocationModel] = locations.map { location in
           return LocationModel(id: UUID().uuidString, name: location.name ?? "Unknown", lat: location.lat, long: location.long)
         }
-        state = .success(value: locationsViewModel)
+        state = .success(locationsViewModel)
       } catch {
         state = .failure(error: error)
       }
     }
   }
-}
-
-enum LocationsState {
-  case loading
-  case success(value: [LocationModel])
-  case failure(error: Error)
+  
+  // Handle the tap event for the location
+  func didTapLocation(location: LocationModel) {
+    guard let url = interactor.getWikipediaURL(for: location) else { return }
+    let application = UIApplication.shared
+    // Open the Wikipedia URL in the app if possible
+    if application.canOpenURL(url) {
+      application.open(url)
+    } else {
+     state = .failure(error: URLError(.badURL))
+    }
+  }
 }

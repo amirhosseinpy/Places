@@ -16,11 +16,11 @@ struct LocationsListView: View {
       content
         .navigationTitle("Locations")
         .task {
-          presenter.loadLocations()
+          presenter.fetchData()
         }
         .alert("Error", isPresented: .constant(isError)) {
           Button("Retry") {
-            presenter.loadLocations()
+            presenter.fetchData()
           }
           Button("OK", role: .cancel) { }
         } message: {
@@ -43,7 +43,7 @@ struct LocationsListView: View {
         }
         .contentShape(Rectangle())
         .onTapGesture {
-          print("Tapped on location: \(location.name)")
+          presenter.didTapLocation(location: location)
         }
       }
     case .failure:

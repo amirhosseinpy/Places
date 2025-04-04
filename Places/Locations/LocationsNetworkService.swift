@@ -7,10 +7,10 @@
 
 import Foundation
 
-actor LocationsNetworkService {
-  private let urlString = "https://raw.githubusercontent.com/abnamrocoesd/assignment-ios/main/locations.json"
+actor LocationsNetworkService: LocationsNetworkServiceProtocol {
   
   func fetchLocations() async throws -> [LocationServerModel] {
+    let urlString = LocationsNetworkConstants.baseURL + LocationsNetworkConstants.locationsEndpoint
     guard let url = URL(string: urlString) else {
       throw URLError(.badURL)
     }
@@ -19,4 +19,13 @@ actor LocationsNetworkService {
     let response = try JSONDecoder().decode(LocationsResponse.self, from: data)
     return response.locations
   }
+}
+
+protocol LocationsNetworkServiceProtocol {
+  func fetchLocations() async throws -> [LocationServerModel]
+}
+
+fileprivate enum LocationsNetworkConstants {
+  static let baseURL = "https://raw.githubusercontent.com/"
+  static let locationsEndpoint = "abnamrocoesd/assignment-ios/main/locations.json"
 }
