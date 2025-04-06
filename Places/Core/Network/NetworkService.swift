@@ -25,11 +25,11 @@ actor NetworkService: NetworkServiceProtocol {
   }
   
   func request<R: APIRouter, D: Decodable>(_ router: R) async throws -> D {
-      guard let baseURL = R.baseURL else { throw URLError(.badURL) }
-      var request = URLRequest(url: baseURL.appendingPathComponent(router.path))
-      request.httpMethod = R.method.rawValue
-      request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-      // we can add token to the header here if needed
+    guard let baseURL = router.baseURL else { throw URLError(.badURL) }
+    var request = URLRequest(url: baseURL.appendingPathComponent(router.path))
+    request.httpMethod = router.method.rawValue
+    request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+    // we can add token to the header here if needed
     let value: D = try await run(request)
     return value
   }

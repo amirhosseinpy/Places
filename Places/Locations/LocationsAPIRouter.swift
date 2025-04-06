@@ -7,8 +7,7 @@
 
 struct LocationsAPIRouter: APIRouter {
   typealias ResponseType = LocationsResponse
-  static var method: HTTPMethod = .get
-  static var canRetry: Bool = true
+  let method: HTTPMethod = .get
   var path: String
   
   init(path: String = "abnamrocoesd/assignment-ios/main/locations.json") {

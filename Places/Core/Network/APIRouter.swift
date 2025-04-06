@@ -13,16 +13,15 @@ public enum HTTPMethod: String, Encodable {
 
 protocol APIRouter {
   associatedtype ResponseType: Codable
-  static var method: HTTPMethod { get }
-  static var baseURL: URL? { get }
-  static var canRetry: Bool { get }
+  var method: HTTPMethod { get }
+  var baseURL: URL? { get }
   
   var path: String { get }
   // We can have parameters for Post requests
 }
 
 extension APIRouter {
-  public static var baseURL: URL? {
+  var baseURL: URL? {
     return URL(string: "https://raw.githubusercontent.com/")
   }
 }
