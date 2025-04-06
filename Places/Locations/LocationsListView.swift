@@ -22,10 +22,14 @@ struct LocationsListView: View {
           Button("Retry") {
             presenter.fetchData()
           }
+          .accessibilityLabel("Retry loading locations")
           Button("OK", role: .cancel) { }
+            .accessibilityLabel("Dismiss error")
         } message: {
           Text(errorMessage)
         }
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel("Locations List")
     }
   }
   
@@ -34,6 +38,7 @@ struct LocationsListView: View {
     switch presenter.state {
     case .loading:
       ProgressView()
+        .accessibilityLabel("Loading locations")
     case .success(let locations):
       List(locations) { location in
         HStack {
@@ -45,9 +50,18 @@ struct LocationsListView: View {
         .onTapGesture {
           presenter.didTapLocation(location: location)
         }
+        .accessibilityElement(children: .combine)
+        .font(.headline)
+        .accessibilityLabel("Location: \(location.name)")
+        .accessibilityHint("Tap to view on Wikipedia")
+        .accessibilityAddTraits(.isButton)
       }
+      .accessibilityLabel("Locations list")
+      .accessibilityHint("Shows all available locations")
     case .failure:
       Text("An error occurred.")
+        .accessibilityLabel("Error loading locations")
+        .accessibilityAddTraits(.isStaticText)
     }
   }
   
