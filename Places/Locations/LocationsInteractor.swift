@@ -8,14 +8,16 @@
 import Foundation
 
 struct LocationsInteractor: LocationsInteractorProtocol {
-  private let networkService: LocationsNetworkServiceProtocol
+  private let networkService: NetworkServiceProtocol
   
-  init(networkService: LocationsNetworkServiceProtocol = LocationsNetworkService()) {
+  init(networkService: NetworkServiceProtocol = NetworkService()) {
     self.networkService = networkService
   }
   
   func getLocations() async throws -> [LocationServerModel] {
-    try await networkService.fetchLocations()
+    let locationsAPIRouter = LocationsAPIRouter()
+    let response: LocationsAPIRouter.ResponseType = try await networkService.request(locationsAPIRouter)
+    return response.locations
   }
   
   func getWikipediaURL(for location: LocationModel) -> URL? {
