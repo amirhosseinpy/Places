@@ -79,6 +79,106 @@ final class LocationsPresenterTests: XCTestCase {
     await fulfillment(of: [expectation], timeout: 1.0)
   }
   
+  func test_fetchData_emptyLocations() async {
+    // Given
+    let expectation = XCTestExpectation(description: "State should update with empty array")
+    mockInteractor.mockLocations = []
+    
+    sut.$state
+      .dropFirst()
+      .sink { state in
+        guard case .success(let locations) = state else {
+          XCTFail("Expected success state with empty array")
+          return
+        }
+        XCTAssertTrue(locations.isEmpty)
+        expectation.fulfill()
+      }
+      .store(in: &cancellables)
+    
+    // When
+    await sut.fetchData()
+    
+    await fulfillment(of: [expectation], timeout: 1.0)
+  }
+  
+  func test_fetchData_multipleLocations() async {
+    // Given
+    let expectation = XCTestExpectation(description: "State should update with multiple locations")
+    let locations = [
+      LocationServerModel(name: "First", lat: 0, long: 0),
+      LocationServerModel(name: "Second", lat: 1, long: 1)
+    ]
+    mockInteractor.mockLocations = locations
+    
+    sut.$state
+      .dropFirst()
+      .sink { state in
+        guard case .success(let receivedLocations) = state else {
+          XCTFail("Expected success state")
+          return
+        }
+        XCTAssertEqual(receivedLocations.count, 2)
+        XCTAssertEqual(receivedLocations[0].name, "First")
+        XCTAssertEqual(receivedLocations[1].name, "Second")
+        expectation.fulfill()
+      }
+      .store(in: &cancellables)
+    
+    // When
+    await sut.fetchData()
+    
+    await fulfillment(of: [expectation], timeout: 1.0)
+  }
+  
+  func test_fetchData_nullLocationName() async {
+    // Given
+    let expectation = XCTestExpectation(description: "State should update with unknown name")
+    let locationWithNullName = LocationServerModel(name: nil, lat: 0, long: 0)
+    mockInteractor.mockLocations = [locationWithNullName]
+    
+    sut.$state
+      .dropFirst()
+      .sink { state in
+        guard case .success(let locations) = state else {
+          XCTFail("Expected success state")
+          return
+        }
+        XCTAssertEqual(locations.first?.name, "Unknown")
+        expectation.fulfill()
+      }
+      .store(in: &cancellables)
+    
+    // When
+    await sut.fetchData()
+    
+    await fulfillment(of: [expectation], timeout: 1.0)
+  }
+  
+  func test_fetchData_networkError() async {
+    // Given
+    let expectation = XCTestExpectation(description: "State should update with network error")
+    mockInteractor.mockError = URLError(.notConnectedToInternet)
+    
+    sut.$state
+      .dropFirst()
+      .sink { state in
+        guard case .failure(let error) = state,
+              let urlError = error as? URLError,
+              urlError.code == .notConnectedToInternet else {
+          XCTFail("Expected network error")
+          return
+        }
+        expectation.fulfill()
+      }
+      .store(in: &cancellables)
+    
+    // When
+    await sut.fetchData()
+    
+    await fulfillment(of: [expectation], timeout: 1.0)
+  }
+  
   func test_didTapLocation_opensURLSuccessfully() async {
     // Given
     let location = LocationModel.stub
@@ -125,5 +225,27 @@ final class LocationsPresenterTests: XCTestCase {
       XCTAssertNil(mockURLService.openedURL)
       
       await fulfillment(of: [expectation], timeout: 1.0)
+  }
+  
+  func test_didTapLocation_nilURL() async {
+    // Given
+    let location = LocationModel.stub
+    mockInteractor.wikipediaURL = nil
+    
+    // When
+    await sut.didTapLocation(location: location)
+    
+    // Then
+    XCTAssertEqual(mockInteractor.getWikipediaURLCallCount, 1)
+    XCTAssertEqual(mockURLService.canOpenURLCallCount, 0)
+    XCTAssertEqual(mockURLService.openURLCallCount, 0)
+  }
+  
+  func test_initialState_isLoading() async {
+    // Then
+    guard case .loading = await sut.state else {
+      XCTFail("Initial state should be loading")
+      return
+    }
   }
 }
