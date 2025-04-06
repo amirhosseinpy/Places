@@ -7,16 +7,18 @@
 import Combine
 import UIKit
 
-@MainActor
+
 class LocationsPresenter: Presentable, ObservableObject {
-  @Published var state: DefaultViewState<[LocationModel]> = .loading
-  
+  @MainActor @Published var state: DefaultViewState<[LocationModel]> = .loading
   private let interactor: LocationsInteractorProtocol
+  private let urlService: URLServiceProtocol
   
-  init(interactor: LocationsInteractorProtocol = LocationsInteractor()) {
+  init(interactor: LocationsInteractorProtocol = LocationsInteractor(), urlService: URLServiceProtocol = URLService()) {
     self.interactor = interactor
+    self.urlService = urlService
   }
   
+  @MainActor
   func fetchData() {
     Task {
       do {
@@ -32,14 +34,14 @@ class LocationsPresenter: Presentable, ObservableObject {
   }
   
   // Handle the tap event for the location
+  @MainActor
   func didTapLocation(location: LocationModel) {
     guard let url = interactor.getWikipediaURL(for: location) else { return }
-    let application = UIApplication.shared
     // Open the Wikipedia URL in the app if possible
-    if application.canOpenURL(url) {
-      application.open(url)
+    if urlService.canOpen(url: url) {
+      urlService.open(url:url)
     } else {
-     state = .failure(error: URLError(.badURL))
+      state = .failure(error: URLError(.badURL))
     }
   }
 }
