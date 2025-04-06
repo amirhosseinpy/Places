@@ -34,9 +34,15 @@ class LocationsPresenter: Presentable, ObservableObject {
   }
   
   // Handle the tap event for the location
+  
   @MainActor
   func didTapLocation(location: LocationModel) {
-    guard let url = interactor.getWikipediaURL(for: location) else { return }
+    didSetCustomLocation(lat: location.lat, lon: location.long)
+  }
+  
+  @MainActor
+  func didSetCustomLocation(lat: Double, lon: Double) {
+    guard let url = interactor.getWikipediaURL(lat: lat, lon: lon) else { return }
     // Open the Wikipedia URL in the app if possible
     if urlService.canOpen(url: url) {
       urlService.open(url:url)

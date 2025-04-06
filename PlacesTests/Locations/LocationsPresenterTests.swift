@@ -195,6 +195,25 @@ final class LocationsPresenterTests: XCTestCase {
     XCTAssertEqual(mockURLService.openURLCallCount, 1)
   }
   
+  func test_didSetCustomLocation_withValidURL_opensURL() async {
+    // Given
+    let lat = 40.7128
+    let lon = -74.0060
+    let expectedURL = URL(string: "wikipedia://places?lat=40.7128&lon=-74.0060")!
+    mockInteractor.wikipediaURL = expectedURL
+    mockURLService.canOpenURLResult = true
+    
+    // When
+    await sut.didSetCustomLocation(lat: lat, lon: lon)
+    
+    // Then
+    XCTAssertEqual(mockInteractor.getWikipediaURLCallCount, 1)
+    XCTAssertEqual(mockInteractor.lastLatitude, lat)
+    XCTAssertEqual(mockInteractor.lastLongitude, lon)
+    XCTAssertEqual(mockURLService.openURLCallCount, 1)
+    XCTAssertEqual(mockURLService.openedURL, expectedURL)
+  }
+  
   func test_didTapLocation_cannotOpenURL() async {
       // Given
       let expectation = XCTestExpectation(description: "State should update to failure")

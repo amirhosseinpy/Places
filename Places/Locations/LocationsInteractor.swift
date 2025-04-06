@@ -20,13 +20,13 @@ struct LocationsInteractor: LocationsInteractorProtocol {
     return response.locations
   }
   
-  func getWikipediaURL(for location: LocationModel) -> URL? {
+  func getWikipediaURL(lat: Double, lon: Double) -> URL? {
     var components = URLComponents()
     components.scheme = "wikipedia"
     components.host = "places"
     components.queryItems = [
-      URLQueryItem(name: "lat", value: "\(location.lat)"),
-      URLQueryItem(name: "lon", value: "\(location.long)"),
+      URLQueryItem(name: "lat", value: "\(lat)"),
+      URLQueryItem(name: "lon", value: "\(lon)"),
     ]
     return components.url
   }
@@ -34,5 +34,5 @@ struct LocationsInteractor: LocationsInteractorProtocol {
 
 protocol LocationsInteractorProtocol {
   func getLocations() async throws -> [LocationServerModel]
-  func getWikipediaURL(for location: LocationModel) -> URL?
+  func getWikipediaURL(lat: Double, lon: Double) -> URL?
 }

@@ -99,7 +99,7 @@ final class LocationsInteractorTests: XCTestCase {
     let location = LocationModel.stub(id: "test", name: "Test", lat: 51.5074, long: -0.1278)
     
     // When
-    guard let url = sut.getWikipediaURL(for: location) else {
+    guard let url = sut.getWikipediaURL(lat: location.lat, lon: location.long) else {
       XCTFail("Expected a valid URL")
       return
     }

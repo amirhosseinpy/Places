@@ -10,6 +10,7 @@ import SwiftUI
 
 struct LocationsListView: View {
   @StateObject private var presenter = LocationsPresenter()
+  @State private var showingLocationInput = false
   
   var body: some View {
     NavigationView {
@@ -17,6 +18,18 @@ struct LocationsListView: View {
         .navigationTitle("Locations")
         .task {
           presenter.fetchData()
+        }
+        .navigationBarItems(trailing: Button(action: {
+          showingLocationInput = true
+        }) {
+          Image(systemName: "location")
+        })
+        .accessibilityLabel("Check a location")
+        .accessibilityHint("Opens form to enter coordinates")
+        .sheet(isPresented: $showingLocationInput) {
+          LocationInputView(isPresented: $showingLocationInput) { location in
+            presenter.didSetCustomLocation(lat: location.lat, lon: location.lon)
+          }
         }
         .alert("Error", isPresented: .constant(isError)) {
           Button("Retry") {

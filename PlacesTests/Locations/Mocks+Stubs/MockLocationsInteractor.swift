@@ -12,6 +12,8 @@ final class MockLocationsInteractor: LocationsInteractorProtocol {
   var mockLocations: [LocationServerModel] = []
   var mockError: Error?
   var wikipediaURL: URL?
+  var lastLatitude: Double?
+  var lastLongitude: Double?
   var getWikipediaURLCallCount = 0
   
   func getLocations() async throws -> [LocationServerModel] {
@@ -21,8 +23,10 @@ final class MockLocationsInteractor: LocationsInteractorProtocol {
     return mockLocations
   }
   
-  func getWikipediaURL(for location: LocationModel) -> URL? {
+  func getWikipediaURL(lat: Double, lon: Double) -> URL? {
     getWikipediaURLCallCount += 1
+    lastLatitude = lat
+    lastLongitude = lon
     return wikipediaURL
   }
 }
