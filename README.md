@@ -70,3 +70,4 @@ struct LocationServerModel {
 ## Further Enhancement 
 1. Add support for Caching and retry in network service
 2. Make error messages user friendly
+3. Add annotation for places called by this app in wikipedia app
