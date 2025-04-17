@@ -12,7 +12,7 @@ final class MockNetworkService: NetworkServiceProtocol {
     private(set) var requestCalled = false
     private(set) var lastRouter: Any?
 
-    func request<R: APIRouter, C: Codable>(_ router: R) async throws -> C {
+    func request<R: APIRouter, C: Decodable>(_ router: R) async throws -> C {
         requestCalled = true
         lastRouter = router
         

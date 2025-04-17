@@ -7,21 +7,18 @@
 import Foundation
 
 protocol NetworkServiceProtocol {
-  func request<R: APIRouter, C: Codable>(_ router: R) async throws -> C
+  func request<R: APIRouter, C: Decodable>(_ router: R) async throws -> C
 }
 
 actor NetworkService: NetworkServiceProtocol {
   private var decoder: JSONDecoder
-  private var encoder: JSONEncoder
   private var session: URLSession
   
   init(session: URLSession = URLSession.shared,
-       decoder: JSONDecoder = JSONDecoder(),
-       encoder: JSONEncoder = JSONEncoder()
+       decoder: JSONDecoder = JSONDecoder()
   ) {
     self.session = session
     self.decoder = decoder
-    self.encoder = encoder
   }
   
   func request<R: APIRouter, D: Decodable>(_ router: R) async throws -> D {
@@ -47,10 +44,12 @@ actor NetworkService: NetworkServiceProtocol {
     guard let response = response as? HTTPURLResponse, data != nil else { throw URLError(.badServerResponse) }
     
     switch response.statusCode {
-      case 400,500:
+    case 401:
+      throw URLError(.userAuthenticationRequired)
+    case 403:
+      throw URLError(.cannotLoadFromNetwork)
+    case 400...503:
         throw URLError(.badServerResponse)
-      case 401:
-        throw URLError(.userAuthenticationRequired)
       default:
         break
     }

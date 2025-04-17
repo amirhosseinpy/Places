@@ -13,7 +13,7 @@ struct LocationsListView: View {
   @State private var showingLocationInput = false
   
   var body: some View {
-    NavigationView {
+    NavigationStack {
       content
         .navigationTitle("Locations")
         .task {
@@ -27,7 +27,8 @@ struct LocationsListView: View {
         .accessibilityLabel("Check a location")
         .accessibilityHint("Opens form to enter coordinates")
         .sheet(isPresented: $showingLocationInput) {
-          LocationInputView(isPresented: $showingLocationInput) { location in
+          LocationInputView() { location in
+            showingLocationInput = false
             presenter.didSetCustomLocation(lat: location.lat, lon: location.lon)
           }
         }
@@ -64,7 +65,6 @@ struct LocationsListView: View {
           presenter.didTapLocation(location: location)
         }
         .accessibilityElement(children: .combine)
-        .font(.headline)
         .accessibilityLabel("Location: \(location.name)")
         .accessibilityHint("Tap to view on Wikipedia")
         .accessibilityAddTraits(.isButton)

@@ -9,13 +9,12 @@ import SwiftUI
 
 struct LocationInputView: View {
   @Environment(\.dismiss) var dismiss
-  @Binding var isPresented: Bool
   @State private var latitude: String = ""
   @State private var longitude: String = ""
   var onLocationSubmit: ((lat: Double, lon: Double)) -> Void
   
   var body: some View {
-    NavigationView {
+    NavigationStack {
       Form {
         Section {
           TextField("Latitude", text: $latitude)

@@ -179,7 +179,7 @@ final class LocationsPresenterTests: XCTestCase {
     await fulfillment(of: [expectation], timeout: 1.0)
   }
   
-  func test_didTapLocation_opensURLSuccessfully() async {
+  func test_didTapLocation_opensURLSuccessfully() {
     // Given
     let location = LocationModel.stub
     let mockURL = URL(string: "wikipedia://test")!
@@ -187,7 +187,7 @@ final class LocationsPresenterTests: XCTestCase {
     mockURLService.canOpenURLResult = true
     
     // When
-    await sut.didTapLocation(location: location)
+    sut.didTapLocation(location: location)
     
     // Then
     XCTAssertEqual(mockInteractor.getWikipediaURLCallCount, 1)
@@ -195,7 +195,7 @@ final class LocationsPresenterTests: XCTestCase {
     XCTAssertEqual(mockURLService.openURLCallCount, 1)
   }
   
-  func test_didSetCustomLocation_withValidURL_opensURL() async {
+  func test_didSetCustomLocation_withValidURL_opensURL() {
     // Given
     let lat = 40.7128
     let lon = -74.0060
@@ -204,7 +204,7 @@ final class LocationsPresenterTests: XCTestCase {
     mockURLService.canOpenURLResult = true
     
     // When
-    await sut.didSetCustomLocation(lat: lat, lon: lon)
+    sut.didSetCustomLocation(lat: lat, lon: lon)
     
     // Then
     XCTAssertEqual(mockInteractor.getWikipediaURLCallCount, 1)
@@ -236,7 +236,7 @@ final class LocationsPresenterTests: XCTestCase {
           .store(in: &cancellables)
       
       // When
-      await sut.didTapLocation(location: location)
+      sut.didTapLocation(location: location)
       
       // Then
       XCTAssertEqual(mockURLService.canOpenURLCallCount, 1)
@@ -252,7 +252,7 @@ final class LocationsPresenterTests: XCTestCase {
     mockInteractor.wikipediaURL = nil
     
     // When
-    await sut.didTapLocation(location: location)
+    sut.didTapLocation(location: location)
     
     // Then
     XCTAssertEqual(mockInteractor.getWikipediaURLCallCount, 1)
